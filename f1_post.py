@@ -156,5 +156,42 @@ def post(expect_date=None, tries=40):
     urllib.request.urlopen(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage", body, timeout=30).read()
 
 
+
+
+# ---- automatic mode: run on a schedule, post once after each race, remember what was posted ----
+STATE = "post_state.json"
+
+
+def race_end(race):
+    """Real end time from OpenF1 when known, otherwise scheduled start + 3h."""
+    start = datetime.fromisoformat(f"{race['date']}T{race.get('time', '00:00:00Z')}".replace("Z", "+00:00"))
+    try:
+        s = next((x for x in of1(f"sessions?year={race['season']}&session_name=Race") if x["date_start"][:10] == race["date"]), None)
+        if s:
+            return datetime.fromisoformat(s["date_end"])
+    except Exception:
+        pass
+    return start + timedelta(hours=3)
+
+
+def auto():
+    now = datetime.now(timezone.utc)
+    races = get("races.json")["RaceTable"]["Races"]
+    done = [r for r in races if now > race_end(r) + timedelta(minutes=20)]
+    if not done:
+        print("no finished race yet"); return
+    r = done[-1]
+    key = f"{r['season']}-{int(r['round'])}"
+    state = json.load(open(STATE)) if os.path.exists(STATE) else {}
+    if state.get("last") == key:
+        print("already posted", key); return
+    post(r["date"], tries=1)
+    json.dump({"last": key}, open(STATE, "w"))
+    print("posted", key)
+
+
 if __name__ == "__main__":
-    post(next((a.split("=")[1] for a in sys.argv if a.startswith("--date=")), None), tries=1)
+    if "--auto" in sys.argv:
+        auto()
+    else:
+        post(next((a.split("=")[1] for a in sys.argv if a.startswith("--date=")), None), tries=1)

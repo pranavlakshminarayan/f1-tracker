@@ -79,8 +79,6 @@ def main():
         if once:
             return
         if now > ts(s["date_end"]) + timedelta(minutes=5):
-            import f1_post
-            f1_post.post(ts(s["date_start"]).date().isoformat())
             return
         time.sleep(30)
 
