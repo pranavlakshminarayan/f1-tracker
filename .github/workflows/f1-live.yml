@@ -1,0 +1,18 @@
+name: F1 live positions
+on:
+  schedule:
+    - cron: "*/15 * * * 0,6"   # Sat/Sun UTC; exits immediately unless a race is about to start or live
+  workflow_dispatch:
+concurrency:
+  group: f1-live
+  cancel-in-progress: false
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 200
+    steps:
+      - uses: actions/checkout@v4
+      - run: python f1_live.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
