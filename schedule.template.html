@@ -15,6 +15,11 @@ header span{color:var(--muted);font-size:13px;text-transform:uppercase;letter-sp
 .next small{text-transform:uppercase;letter-spacing:.1em;font-weight:700;opacity:.85}
 .next h2{margin:0;font-size:24px;font-weight:900}
 .next ul{margin:4px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 16px;font-variant-numeric:tabular-nums}
+.tbl{background:var(--panel);padding:12px 14px;overflow-x:auto}
+.tbl h3{margin:0 0 8px;font-size:18px;font-weight:900;text-transform:uppercase;border-left:4px solid var(--red);padding-left:10px}
+.tbl table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+.tbl th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.tbl td,.tbl th{padding:5px 8px 5px 0;white-space:nowrap}.tbl tr.pod td:first-child{color:var(--red);font-weight:900}
 .race{background:var(--panel);border-left:4px solid var(--line);padding:12px 14px;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center}
 .race.done{opacity:.55}
 .race.is-next{border-left-color:var(--red)}
@@ -27,7 +32,7 @@ header span{color:var(--muted);font-size:13px;text-transform:uppercase;letter-sp
 </style>
 <main>
 <header><h1>F1 2026 Schedule</h1><span>Times in Singapore (SGT)</span></header>
-<section id="next"></section><section id="list" style="display:flex;flex-direction:column;gap:8px"></section>
+<section id="next"></section><section id="res"></section><section id="std"></section><section id="list" style="display:flex;flex-direction:column;gap:8px"></section>
 </main>
 <script>
 const races=__DATA__;
@@ -37,5 +42,9 @@ const now=new Date();
 races.forEach(r=>{r.s=r.sessions.map(([n,t])=>[n,new Date(t.endsWith("Z")?t:t+"Z")]);r.race=r.s[r.s.length-1][1];});
 const nxt=races.find(r=>r.race.getTime()+2*3600e3>now);
 if(nxt){document.getElementById("next").innerHTML=`<div class="next"><small>Next race · Round ${nxt.round}</small><h2>${nxt.name}</h2><span>${nxt.circuit} · ${nxt.place}</span><ul>${nxt.s.map(([n,d])=>`<li><b>${n}</b> ${fmtD(d)} ${fmtT(d)}</li>`).join("")}</ul></div>`;}
+const R=__RESULT__,S=__STAND__;
+const tbl=(t,hd,rows)=>`<div class="tbl"><h3>${t}</h3><table><tr>${hd.map(x=>`<th>${x}</th>`).join("")}</tr>${rows.map(r=>`<tr class="${r[0]<=3?"pod":""}">${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
+document.getElementById("res").innerHTML=tbl(`Last race · R${R.round} ${R.name}`,["Pos","Driver","Team","Time / Status","Pts"],R.rows);
+document.getElementById("std").innerHTML=tbl("Driver standings",["Pos","Driver","Team","Wins","Pts"],S);
 document.getElementById("list").innerHTML=races.map(r=>`<div class="race ${r.race<now&&r!==nxt?"done":""} ${r===nxt?"is-next":""}"><span class="rd">${String(r.round).padStart(2,"0")}</span><div><b>${r.name}</b><p>${r.circuit} · ${r.place}</p></div><div class="when">${fmtD(r.race)}<i>Race ${fmtT(r.race)}</i></div></div>`).join("");
 </script>

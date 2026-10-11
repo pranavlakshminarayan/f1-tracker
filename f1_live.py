@@ -76,7 +76,11 @@ def main():
             msg_id = tg("sendMessage", chat_id=CHAT, text=text, parse_mode="HTML").get("result", {}).get("message_id")
         else:
             tg("editMessageText", chat_id=CHAT, message_id=msg_id, text=text, parse_mode="HTML")
-        if once or now > ts(s["date_end"]) + timedelta(minutes=5):
+        if once:
+            return
+        if now > ts(s["date_end"]) + timedelta(minutes=5):
+            import f1_post
+            f1_post.post(ts(s["date_start"]).date().isoformat())
             return
         time.sleep(30)
 

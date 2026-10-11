@@ -9,9 +9,10 @@ concurrency:
 jobs:
   live:
     runs-on: ubuntu-latest
-    timeout-minutes: 200
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
+      - run: pip install pillow
       - run: python f1_live.py
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
