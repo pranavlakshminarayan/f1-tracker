@@ -79,30 +79,81 @@ def send_photo(img, caption):
     urllib.request.urlopen(req, timeout=60).read()
 
 
+POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1]
+OF1 = "https://api.openf1.org/v1/"
+
+
+def of1(path):
+    with urllib.request.urlopen(OF1 + path, timeout=40) as r:
+        return json.load(r)
+
+
+def dcode(d):
+    return d.get("code") or d["familyName"][:3].upper()
+
+
+def official(expect_date):
+    race = (get("last/results.json")["RaceTable"]["Races"] or [None])[0]
+    if not race or (expect_date and race["date"] != expect_date):
+        return None
+    res = [[r["position"], dcode(r["Driver"]), r["Constructor"]["name"][:16], r.get("Time", {}).get("time", r["status"]), r["points"]] for r in race["Results"][:10]]
+    st = get("driverstandings.json")["StandingsTable"]["StandingsLists"][0]["DriverStandings"]
+    stand = [[s["position"], dcode(s["Driver"]), s["Constructors"][0]["name"][:16], s["wins"], s["points"]] for s in st[:10]]
+    return race["raceName"], race["round"], res, stand, False
+
+
+def provisional(expect_date):
+    """Same tables built from OpenF1 final positions while the official results feed lags."""
+    race = next((r for r in get("races.json")["RaceTable"]["Races"] if r["date"] == expect_date), None)
+    sess = next((s for s in of1(f"sessions?year={expect_date[:4]}&session_name=Race") if s["date_start"][:10] == expect_date), None)
+    if not race or not sess:
+        return None
+    key = sess["session_key"]
+    drv = {d["driver_number"]: d["name_acronym"] for d in of1(f"drivers?session_key={key}")}
+    final = {}
+    for p in of1(f"position?session_key={key}"):
+        final[p["driver_number"]] = p["position"]
+    order = [drv.get(n, str(n)) for n, _ in sorted(final.items(), key=lambda x: x[1])]
+    base = get("driverstandings.json")["StandingsTable"]["StandingsLists"][0]
+    last = (get("last/results.json")["RaceTable"]["Races"] or [{"round": 0}])[0]
+    if int(last["round"]) >= int(race["round"]):
+        return None  # standings already include this race
+    tbl = {dcode(s["Driver"]): {"team": s["Constructors"][0]["name"], "pts": float(s["points"]), "wins": int(s["wins"])} for s in base["DriverStandings"]}
+    res = []
+    for pos, c in enumerate(order, 1):
+        pts = POINTS[pos - 1] if pos <= 10 else 0
+        if c in tbl:
+            tbl[c]["pts"] += pts
+            tbl[c]["wins"] += 1 if pos == 1 else 0
+        res.append([pos, c, tbl.get(c, {}).get("team", "")[:16], "provisional", pts])
+    ranked = sorted(tbl.items(), key=lambda x: (-x[1]["pts"], -x[1]["wins"]))
+    stand = [[i, c, v["team"][:16], v["wins"], int(v["pts"])] for i, (c, v) in enumerate(ranked[:10], 1)]
+    return race["raceName"], race["round"], res[:10], stand, True
+
+
 def post(expect_date=None, tries=40):
-    for _ in range(tries):
-        race = (get("last/results.json")["RaceTable"]["Races"] or [None])[0]
-        if race and (expect_date is None or race["date"] == expect_date):
+    data = None
+    for n in range(tries):
+        data = official(expect_date)
+        if data:
             break
-        time.sleep(60)
-    else:
-        print("results not published"); return
-    res = [[r["position"], r["Driver"]["code"] if "code" in r["Driver"] else r["Driver"]["familyName"][:3].upper(),
-            r["Constructor"]["name"][:16], r.get("Time", {}).get("time", r["status"]), r["points"]] for r in race["Results"][:10]]
-    send_photo(table_image(f"{race['raceName']} – Result", f"Round {race['round']} · Top 10", ["POS", "DRIVER", "TEAM", "TIME / STATUS", "PTS"],
-                           res, [90, 130, 260, 230, 70]), f"Round {race['round']} result")
-    st = get("driverstandings.json")["StandingsTable"]["StandingsLists"][0]["DriverStandings"][:10]
-    rows = [[s["position"], s["Driver"].get("code", s["Driver"]["familyName"][:3].upper()), s["Constructors"][0]["name"][:16], s["wins"], s["points"]] for s in st]
-    send_photo(table_image("Driver Standings", f"After round {race['round']}", ["POS", "DRIVER", "TEAM", "WINS", "PTS"], rows, [90, 130, 260, 120, 90]), "Championship standings")
-    nxt = next((r for r in get("races.json")["RaceTable"]["Races"] if int(r["round"]) > int(race["round"])), None)
+        if n < tries - 1:
+            time.sleep(60)
+    if not data and expect_date:
+        data = provisional(expect_date)
+    if not data:
+        print("results not available"); return
+    name, rnd, res, stand, prov = data
+    tag = " · PROVISIONAL" if prov else ""
+    send_photo(table_image(f"{name} – Result", f"Round {rnd} · Top 10{tag}", ["POS", "DRIVER", "TEAM", "TIME / STATUS", "PTS"],
+                           res, [90, 130, 260, 230, 70]), f"Round {rnd} result" + (" (provisional, official results pending)" if prov else ""))
+    send_photo(table_image("Driver Standings", f"After round {rnd}{tag}", ["POS", "DRIVER", "TEAM", "WINS", "PTS"], stand, [90, 130, 260, 120, 90]), "Championship standings")
+    nxt = next((r for r in get("races.json")["RaceTable"]["Races"] if int(r["round"]) > int(rnd)), None)
     if nxt:
         send_photo(next_race_image(nxt), f"Next: {nxt['raceName']}")
-    else:
-        print("season finished")
-    # text link message
     msg = "Schedule: " + PAGE_URL + "\nStandings: " + PAGE_URL + "standings.html\nNews: " + PAGE_URL + "news.html"
-    data = ("chat_id=" + os.environ["TELEGRAM_CHAT_ID"] + "&text=" + urllib.request.quote(msg)).encode()
-    urllib.request.urlopen(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage", data, timeout=30).read()
+    body = ("chat_id=" + os.environ["TELEGRAM_CHAT_ID"] + "&text=" + urllib.request.quote(msg)).encode()
+    urllib.request.urlopen(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage", body, timeout=30).read()
 
 
 if __name__ == "__main__":
