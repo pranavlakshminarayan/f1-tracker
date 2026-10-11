@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F1 2026 Standings</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&display=swap">
+<style>
+:root{--bg:#f4f4f5;--panel:#fff;--fg:#15151e;--muted:#6b6b78;--line:#dcdce0;--red:#e10600;--on-red:#fff;--font:"Titillium Web","Segoe UI",Arial,sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#15151e;--panel:#1f1f2b;--fg:#fff;--muted:#a0a0b0;--line:#33333f;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);padding-inline:16px;padding-block:20px;font-size:15px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--red);padding-bottom:10px}
+h1{margin:0;font-size:28px;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.02em}
+nav{display:flex;gap:16px;font-weight:700;text-transform:uppercase;font-size:13px;letter-spacing:.08em}nav a{color:var(--muted);text-decoration:none;padding-bottom:2px}nav a[aria-current]{color:var(--fg);border-bottom:2px solid var(--red)}
+.tz{color:var(--muted);font-size:12px;margin:0}
+.next{background:var(--red);color:var(--on-red);padding:16px;border-radius:4px;display:flex;flex-direction:column;gap:6px}
+.next small{text-transform:uppercase;letter-spacing:.1em;font-weight:700;opacity:.85}
+.next h2{margin:0;font-size:24px;font-weight:900}
+.next ul{margin:4px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 16px;font-variant-numeric:tabular-nums}
+.tbl{background:var(--panel);padding:12px 14px;overflow-x:auto}
+.tbl h3{margin:0 0 8px;font-size:18px;font-weight:900;text-transform:uppercase;border-left:4px solid var(--red);padding-left:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tbl table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+.tbl th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.tbl td,.tbl th{padding:5px 8px 5px 0;white-space:nowrap}.tbl tr.pod td:first-child{color:var(--red);font-weight:900}
+.badge{background:var(--red);color:#fff;font-size:11px;padding:2px 8px;letter-spacing:.1em}
+.badge.live{animation:p 1.4s infinite}@keyframes p{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.badge.live{animation:none}}
+.note{color:var(--muted);font-size:12px;margin:6px 0 0}
+.race{background:var(--panel);border-left:4px solid var(--line);padding:12px 14px;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center}
+.race.done{opacity:.55}.race.is-next{border-left-color:var(--red)}
+.rd{font-weight:900;font-size:22px;color:var(--red)}.race b{font-size:17px}
+.race p{margin:2px 0 0;color:var(--muted);font-size:13px;min-width:0}
+.when{text-align:right;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600}
+.when i{display:block;font-style:normal;color:var(--muted);font-weight:400;font-size:12px}
+#list{display:flex;flex-direction:column;gap:8px}
+@media(max-width:480px){.race{grid-template-columns:36px 1fr}.when{grid-column:2;text-align:left}}
+</style></head><body>
+<main>
+<header><h1>F1 2026 Standings</h1><nav><a href="./">Schedule</a><a href="standings.html" aria-current="page">Standings</a><a href="news.html">News</a></nav></header>
+<section id="res"></section><section id="std"></section><section id="con"></section>
+</main>
+<script>
+const J="https://api.jolpi.ca/ergast/f1/current/";
+const jget=p=>fetch(J+p).then(r=>r.json()).then(j=>j.MRData);
+const code=x=>x.code||x.familyName.slice(0,3).toUpperCase();
+const tbl=(t,hd,rows)=>`<div class="tbl"><h3>${t}</h3><table><tr>${hd.map(x=>`<th>${x}</th>`).join("")}</tr>${rows.map(r=>`<tr class="${r[0]<=3?"pod":""}">${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
+const $=id=>document.getElementById(id);
+(async()=>{
+  const [last,ds,cs]=await Promise.all([jget("last/results.json"),jget("driverstandings.json"),jget("constructorstandings.json")]);
+  const L=last.RaceTable.Races[0];
+  if(L)$("res").innerHTML=tbl(`Last race · R${L.round} ${L.raceName}`,["Pos","Driver","Team","Time / Status","Pts"],L.Results.map(r=>[r.position,code(r.Driver),r.Constructor.name,(r.Time&&r.Time.time)||r.status,r.points]));
+  const D=ds.StandingsTable.StandingsLists[0];
+  if(D)$("std").innerHTML=tbl("Driver standings",["Pos","Driver","Team","Wins","Pts"],D.DriverStandings.map(s=>[s.position,code(s.Driver),s.Constructors[0].name,s.wins,s.points]));
+  const C=cs.StandingsTable.StandingsLists[0];
+  if(C)$("con").innerHTML=tbl("Constructor standings",["Pos","Team","Wins","Pts"],C.ConstructorStandings.map(s=>[s.position,s.Constructor.name,s.wins,s.points]));
+})().catch(()=>$("res").textContent="Could not load standings. Refresh to retry.");
+</script></body></html>
