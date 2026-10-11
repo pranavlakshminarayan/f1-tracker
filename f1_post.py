@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 API = "https://api.jolpi.ca/ergast/f1/current/"
 SGT = timezone(timedelta(hours=8))
 RED, BLACK, WHITE, GREY, PANEL = "#E10600", "#15151E", "#FFFFFF", "#A0A0B0", "#1F1F2B"
-PAGE_URL = os.environ.get("PAGE_URL", "https://claude.ai/artifact/6FrTbG6TVg4KV1UupbWhUg")
+PAGE_URL = os.environ.get("PAGE_URL", "https://pranavlakshminarayan.github.io/f1-tracker/")
 FONTS = ["DejaVuSans-Bold.ttf", "arialbd.ttf", "Arial Bold.ttf"]
 
 
