@@ -92,14 +92,32 @@ def dcode(d):
     return d.get("code") or d["familyName"][:3].upper()
 
 
+def standings_after(rnd):
+    """Driver standings after a given round (the per-round feed updates before the 'current' one)."""
+    d = get(f"{rnd}/driverstandings.json")["StandingsTable"]["StandingsLists"]
+    return d[0]["DriverStandings"] if d else None
+
+
 def official(expect_date):
     race = (get("last/results.json")["RaceTable"]["Races"] or [None])[0]
     if not race or (expect_date and race["date"] != expect_date):
         return None
     res = [[r["position"], dcode(r["Driver"]), r["Constructor"]["name"][:16], r.get("Time", {}).get("time", r["status"]), r["points"]] for r in race["Results"][:10]]
-    st = get("driverstandings.json")["StandingsTable"]["StandingsLists"][0]["DriverStandings"]
-    stand = [[s["position"], dcode(s["Driver"]), s["Constructors"][0]["name"][:16], s["wins"], s["points"]] for s in st[:10]]
-    return race["raceName"], race["round"], res, stand, False
+    prov = False
+    st = standings_after(int(race["round"]))
+    if st:
+        stand = [[s["position"], dcode(s["Driver"]), s["Constructors"][0]["name"][:16], s["wins"], s["points"]] for s in st[:10]]
+    else:  # standings not out yet: previous round plus this race's points
+        prov = True
+        tbl = {dcode(s["Driver"]): {"team": s["Constructors"][0]["name"], "pts": float(s["points"]), "wins": int(s["wins"])} for s in (standings_after(int(race["round"]) - 1) or [])}
+        for r in race["Results"]:
+            c = dcode(r["Driver"])
+            if c in tbl:
+                tbl[c]["pts"] += float(r["points"])
+                tbl[c]["wins"] += 1 if r["position"] == "1" else 0
+        ranked = sorted(tbl.items(), key=lambda x: (-x[1]["pts"], -x[1]["wins"]))
+        stand = [[i, c, v["team"][:16], v["wins"], int(v["pts"])] for i, (c, v) in enumerate(ranked[:10], 1)]
+    return race["raceName"], race["round"], res, stand, prov
 
 
 def provisional(expect_date):
@@ -114,8 +132,8 @@ def provisional(expect_date):
     for p in of1(f"position?session_key={key}"):
         final[p["driver_number"]] = p["position"]
     order = [drv.get(n, str(n)) for n, _ in sorted(final.items(), key=lambda x: x[1])]
-    base = get("driverstandings.json")["StandingsTable"]["StandingsLists"][0]
     last = (get("last/results.json")["RaceTable"]["Races"] or [{"round": 0}])[0]
+    base = {"DriverStandings": standings_after(int(last["round"])) or []}
     if int(last["round"]) >= int(race["round"]):
         return None  # standings already include this race
     tbl = {dcode(s["Driver"]): {"team": s["Constructors"][0]["name"], "pts": float(s["points"]), "wins": int(s["wins"])} for s in base["DriverStandings"]}

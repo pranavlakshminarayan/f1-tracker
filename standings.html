@@ -35,11 +35,24 @@ details{background:var(--panel);padding:10px 14px}summary{cursor:pointer;font-we
 .when{text-align:right;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600}
 .when i{display:block;font-style:normal;color:var(--muted);font-weight:400;font-size:12px}
 @media(max-width:480px){.race{grid-template-columns:36px 1fr}.when{grid-column:2;text-align:left}}
+.sec{margin:4px 0 8px;font-size:20px;font-weight:900;font-style:italic;text-transform:uppercase}
+.pods{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.pod{background:var(--panel);padding:12px 14px;min-width:0}
+.pod h3{margin:0 0 10px;font-size:14px;font-weight:900;text-transform:uppercase;border-left:4px solid var(--red);padding-left:10px}
+.steps{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:6px}
+.col{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.who{display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:6px;min-width:0;width:100%}
+.who b{font-size:13px;line-height:1.15;overflow-wrap:anywhere}.who small{color:var(--muted);font-size:11px;line-height:1.2}
+.face,.ini{width:58px;height:58px;border-radius:50%;object-fit:cover;object-position:top;background:var(--line)}
+.logo{width:52px;height:52px;border-radius:10px;object-fit:contain;background:#fff;padding:4px}
+.ini{display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--muted);border-radius:50%}
+.step{width:100%;background:var(--c);display:flex;justify-content:center;align-items:flex-start;padding-top:4px;font-weight:900;font-size:26px}
+.p1 .step{height:84px}.p2 .step{height:60px}.p3 .step{height:44px}
 </style></head><body>
 <main>
 <h1>F1 Standings</h1>
 <nav><a href="./">Schedule</a><a href="standings.html" aria-current=page>Standings</a><a href="news.html">News</a></nav>
-<section id="live" hidden></section><section id="res"></section><section id="std"></section><section id="con"></section><p class="note" id="note"></p>
+<section id="live" hidden></section><section id="podium"></section><section id="res"></section><section id="std"></section><section id="con"></section><p class="note" id="note"></p>
 </main>
 <script>
 const $=id=>document.getElementById(id);
@@ -56,34 +69,83 @@ const sessions=r=>[...KEYS.filter(([k])=>r[k]).map(([k,l])=>[l,dt(r[k])]),["Race
 const POINTS=[25,18,15,12,10,8,6,4,2,1];
 const tbl=(t,hd,rows,extra="")=>`<div class="tbl"><h3>${t}${extra}</h3><table><tr>${hd.map(x=>`<th>${x}</th>`).join("")}</tr>${rows.map(r=>`<tr class="${r[0]<=3?"pod":""}">${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
 const PROV='<span class="badge">PROVISIONAL</span>';
-// Official numbers come from the results feed. If it is behind a race that has finished,
-// build the same tables from live-timing positions and label them provisional.
-async function provisional(cal,L,D,C){
-  const lastRound=L?+L.round:0,now=Date.now();
-  const race=cal.filter(r=>+r.round>lastRound&&dt(r).getTime()+3*3600e3<now).pop();
-  if(!race)return null;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// Standings after a given round. The per-round feed is updated before the "current" one, so always ask by round.
+const getS=async n=>{
+  if(n<1)return{D:[],C:[]};
+  const [d,c]=await Promise.all([jget(`${n}/driverstandings.json`),jget(`${n}/constructorstandings.json`)]);
+  const a=d.StandingsTable.StandingsLists[0],b=c.StandingsTable.StandingsLists[0];
+  return a&&b?{D:a.DriverStandings,C:b.ConstructorStandings}:null;
+};
+// Previous standings plus one race's points: used only while the feed is behind a finished race.
+function addPoints(D,C,list){
+  const T={};D.forEach(x=>T[code(x.Driver)]={team:x.Constructors[0].name,id:x.Constructors[0].constructorId,pts:+x.points,wins:+x.wins});
+  const CP={};C.forEach(x=>CP[x.Constructor.constructorId]={name:x.Constructor.name,pts:+x.points,wins:+x.wins});
+  list.forEach(e=>{const t=T[e.who];if(!t)return;t.pts+=e.pts;t.wins+=e.win;const k=CP[t.id];if(k){k.pts+=e.pts;k.wins+=e.win}});
+  return{
+    drivers:Object.entries(T).sort((a,b)=>b[1].pts-a[1].pts||b[1].wins-a[1].wins).map(([c,v],i)=>[i+1,c,v.team,v.wins,v.pts]),
+    cons:Object.values(CP).sort((a,b)=>b.pts-a.pts||b.wins-a.wins).map((v,i)=>[i+1,v.name,v.wins,v.pts])};
+}
+const fromFeed=S=>({
+  drivers:S.D.map(s=>[s.position,code(s.Driver),s.Constructors[0].name,s.wins,s.points]),
+  cons:S.C.map(s=>[s.position,s.Constructor.name,s.wins,s.points])});
+
+// Final positions from live timing, for a race that has finished but is not in the results feed yet.
+async function liveFinal(race,D){
   const s=(await oget(`sessions?year=${race.season}&session_name=Race`)).find(x=>x.date_start.slice(0,10)===race.date);
   if(!s)return null;
   const drv={};(await oget(`drivers?session_key=${s.session_key}`)).forEach(d=>drv[d.driver_number]=d.name_acronym);
   const fin={};(await oget(`position?session_key=${s.session_key}`)).forEach(p=>fin[p.driver_number]=p.position);
   const order=Object.entries(fin).sort((a,b)=>a[1]-b[1]).map(([n])=>drv[n]||n);
-  const T={};D.forEach(x=>T[code(x.Driver)]={team:x.Constructors[0].name,id:x.Constructors[0].constructorId,pts:+x.points,wins:+x.wins});
-  const CP={};C.forEach(x=>CP[x.Constructor.constructorId]={name:x.Constructor.name,pts:+x.points,wins:+x.wins});
-  const res=order.map((c,i)=>{const p=i<10?POINTS[i]:0;if(T[c]){T[c].pts+=p;T[c].wins+=i===0?1:0;if(CP[T[c].id]){CP[T[c].id].pts+=p;CP[T[c].id].wins+=i===0?1:0}}return[i+1,c,(T[c]||{}).team||"","provisional",p]});
-  const drivers=Object.entries(T).sort((a,b)=>b[1].pts-a[1].pts||b[1].wins-a[1].wins).map(([c,v],i)=>[i+1,c,v.team,v.wins,v.pts]);
-  const cons=Object.values(CP).sort((a,b)=>b.pts-a.pts||b.wins-a.wins).map((v,i)=>[i+1,v.name,v.wins,v.pts]);
-  return{title:`Last race · R${race.round} ${race.raceName}`,res,drivers,cons};
+  const team={};D.forEach(x=>team[code(x.Driver)]=x.Constructors[0].name);
+  const list=order.map((c,i)=>({who:c,pts:i<10?POINTS[i]:0,win:i===0?1:0}));
+  return{rows:order.map((c,i)=>[i+1,c,team[c]||"","provisional",list[i].pts]),list};
 }
+
+// Podium section
+const SLUG={"mercedes":"mercedes","ferrari":"ferrari","mclaren":"mclaren","red bull":"red-bull-racing","rb f1 team":"racing-bulls","racing bulls":"racing-bulls","alpine":"alpine","williams":"williams","aston martin":"aston-martin"};
+const logoOf=n=>{const k=Object.keys(SLUG).find(k=>n.toLowerCase().startsWith(k));return k?`https://media.formula1.com/content/dam/fom-website/teams/2025/${SLUG[k]}-logo.png`:""};
+const inkOn=hex=>{const n=parseInt((hex||"e10600").replace("#",""),16),l=(0.299*(n>>16)+0.587*((n>>8)&255)+0.114*(n&255));return l>150?"#15151e":"#fff"};
+function podium(title,items){
+  const order=[1,0,2];
+  return `<div class="pod"><h3>${esc(title)}</h3><div class="steps">${order.map(i=>{
+    const it=items[i];if(!it)return"<div></div>";
+    const ini=esc(it.name.split(" ").map(w=>w[0]).join("").slice(0,2));
+    const fb=`this.replaceWith(Object.assign(document.createElement('div'),{className:'ini',textContent:'${ini}'}))`;
+    const img=it.img?`<img class="${it.logo?"logo":"face"}" src="${esc(it.img)}" alt="" referrerpolicy="no-referrer" onerror="${fb}">`:`<div class="ini">${ini}</div>`;
+    return `<div class="col p${i+1}"><div class="who">${img}<b>${esc(it.name)}</b><small>${esc(it.sub)}</small></div><div class="step" style="--c:#${it.colour||"e10600"};color:${inkOn(it.colour)}">${i+1}</div></div>`}).join("")}</div></div>`;
+}
+
 (async()=>{
-  const [cal,last,ds,cs]=await Promise.all([jget("races.json"),jget("last/results.json"),jget("driverstandings.json"),jget("constructorstandings.json")]);
-  const L=last.RaceTable.Races[0],D=ds.StandingsTable.StandingsLists[0].DriverStandings,C=cs.StandingsTable.StandingsLists[0].ConstructorStandings;
-  let v=await provisional(cal.RaceTable.Races,L,D,C).catch(()=>null),badge="";
-  if(v)badge=PROV;
-  else v={title:`Last race · R${L.round} ${L.raceName}`,res:L.Results.map(r=>[r.position,code(r.Driver),r.Constructor.name,(r.Time&&r.Time.time)||r.status,r.points]),drivers:D.map(s=>[s.position,code(s.Driver),s.Constructors[0].name,s.wins,s.points]),cons:C.map(s=>[s.position,s.Constructor.name,s.wins,s.points])};
-  $("res").innerHTML=tbl(v.title,["Pos","Driver","Team","Time / Status","Pts"],v.res,badge);
-  $("std").innerHTML=tbl("Driver standings",["Pos","Driver","Team","Wins","Pts"],v.drivers,badge);
-  $("con").innerHTML=tbl("Constructor standings",["Pos","Team","Wins","Pts"],v.cons,badge);
-  if(badge)$("note").textContent="Provisional: built from live-timing positions while official results are pending. This page switches to the official numbers by itself.";
+  const [cal,last]=await Promise.all([jget("races.json"),jget("last/results.json")]);
+  const L=last.RaceTable.Races[0],races=cal.RaceTable.Races,R=+L.round;
+  const base=await getS(R);
+  const pend=races.filter(r=>+r.round>R&&dt(r).getTime()+3*3600e3<Date.now()).pop();
+  const pr=pend&&base?await liveFinal(pend,base.D).catch(()=>null):null;
+  let title,res,S,resBadge="",stdBadge="";
+  if(pr){ // a finished race is not in the feed yet
+    title=`Last race · R${pend.round} ${pend.raceName}`;res=pr.rows;resBadge=stdBadge=PROV;
+    S=addPoints(base.D,base.C,pr.list);
+  }else{
+    title=`Last race · R${L.round} ${L.raceName}`;
+    res=L.Results.map(r=>[r.position,code(r.Driver),r.Constructor.name,(r.Time&&r.Time.time)||r.status,r.points]);
+    if(base)S=fromFeed(base);
+    else{const prev=await getS(R-1);S=addPoints(prev.D,prev.C,L.Results.map(r=>({who:code(r.Driver),pts:+r.points,win:r.position==="1"?1:0})));stdBadge=PROV}
+  }
+  $("res").innerHTML=tbl(title,["Pos","Driver","Team","Time / Status","Pts"],res,resBadge);
+  $("std").innerHTML=tbl("Driver standings",["Pos","Driver","Team","Wins","Pts"],S.drivers,stdBadge);
+  $("con").innerHTML=tbl("Constructor standings",["Pos","Team","Wins","Pts"],S.cons,stdBadge);
+  if(resBadge||stdBadge)$("note").textContent="Provisional: built from live-timing positions and previous standings while the official numbers are pending. This page switches to the official numbers by itself.";
+
+  // podiums
+  const meta={};(await oget("drivers?session_key=latest")).forEach(d=>meta[d.name_acronym]={full:`${d.first_name} ${d.last_name}`,img:d.headshot_url,colour:d.team_colour});
+  const drv=c=>{const m=meta[c]||{};return{name:m.full||c,img:m.img,colour:m.colour}};
+  const teamColour={};S.drivers.forEach(r=>{if(!teamColour[r[2]]&&meta[r[1]])teamColour[r[2]]=meta[r[1]].colour});
+  const raceItems=res.slice(0,3).map(r=>({...drv(r[1]),sub:r[2]}));
+  const drvItems=S.drivers.slice(0,3).map(r=>({...drv(r[1]),sub:`${r[2]} · ${r[4]} pts`}));
+  const conItems=S.cons.slice(0,3).map(r=>({name:r[1],img:logoOf(r[1]),logo:true,colour:teamColour[r[1]],sub:`${r[3]} pts`}));
+  $("podium").innerHTML=`<h2 class="sec">Podium</h2><div class="pods">${podium(title.replace("Last race · ","Race · "),raceItems)}${podium("Driver standings",drvItems)}${podium("Constructor standings",conItems)}</div>`;
 })().catch(()=>$("res").textContent="Could not load standings. Refresh to retry.");
 
 // Live positions, only while a race is running

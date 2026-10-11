@@ -35,6 +35,19 @@ details{background:var(--panel);padding:10px 14px}summary{cursor:pointer;font-we
 .when{text-align:right;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600}
 .when i{display:block;font-style:normal;color:var(--muted);font-weight:400;font-size:12px}
 @media(max-width:480px){.race{grid-template-columns:36px 1fr}.when{grid-column:2;text-align:left}}
+.sec{margin:4px 0 8px;font-size:20px;font-weight:900;font-style:italic;text-transform:uppercase}
+.pods{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.pod{background:var(--panel);padding:12px 14px;min-width:0}
+.pod h3{margin:0 0 10px;font-size:14px;font-weight:900;text-transform:uppercase;border-left:4px solid var(--red);padding-left:10px}
+.steps{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:6px}
+.col{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.who{display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:6px;min-width:0;width:100%}
+.who b{font-size:13px;line-height:1.15;overflow-wrap:anywhere}.who small{color:var(--muted);font-size:11px;line-height:1.2}
+.face,.ini{width:58px;height:58px;border-radius:50%;object-fit:cover;object-position:top;background:var(--line)}
+.logo{width:52px;height:52px;border-radius:10px;object-fit:contain;background:#fff;padding:4px}
+.ini{display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--muted);border-radius:50%}
+.step{width:100%;background:var(--c);display:flex;justify-content:center;align-items:flex-start;padding-top:4px;font-weight:900;font-size:26px}
+.p1 .step{height:84px}.p2 .step{height:60px}.p3 .step{height:44px}
 </style></head><body>
 <main>
 <h1>F1 Schedule</h1>
