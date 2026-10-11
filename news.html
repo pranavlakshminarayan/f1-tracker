@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F1 News</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&display=swap">
+<style>
+:root{--bg:#f4f4f5;--panel:#fff;--fg:#15151e;--muted:#6b6b78;--line:#dcdce0;--red:#e10600;--font:"Titillium Web","Segoe UI",Arial,sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#15151e;--panel:#1f1f2b;--fg:#fff;--muted:#a0a0b0;--line:#33333f;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);padding-inline:16px;padding-block:20px;font-size:15px}
+main{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--red);padding-bottom:10px}
+h1{margin:0;font-size:28px;font-weight:900;font-style:italic;text-transform:uppercase}
+nav{display:flex;gap:16px;font-weight:700;text-transform:uppercase;font-size:13px;letter-spacing:.08em}
+nav a{color:var(--muted);text-decoration:none;padding-bottom:2px}nav a[aria-current]{color:var(--fg);border-bottom:2px solid var(--red)}
+a:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+h2{margin:0;font-size:18px;font-weight:900;text-transform:uppercase;border-left:4px solid var(--red);padding-left:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--panel);display:flex;flex-direction:column;color:inherit;text-decoration:none;min-width:0}
+.card img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--line)}
+.card div{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.card small{color:var(--red);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+.card small i{color:var(--muted);font-style:normal;font-weight:400}
+.card b{font-size:16px;line-height:1.25}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+.card:hover b{text-decoration:underline}
+.note{color:var(--muted);font-size:12px}
+</style></head><body>
+<main>
+<header><h1>F1 News</h1><nav><a href="./">Schedule</a><a href="news.html" aria-current="page">News</a></nav></header>
+<section id="race" hidden style="display:flex;flex-direction:column;gap:10px"></section>
+<section style="display:flex;flex-direction:column;gap:10px"><h2>Latest from around the web</h2><div class="grid" id="all"></div></section>
+<p class="note" id="foot"></p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ago=t=>{const m=Math.round((Date.now()-new Date(t))/6e4);return m<60?m+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"};
+const card=i=>`<a class="card" href="${esc(i.link)}" target="_blank" rel="noopener noreferrer">${i.image?`<img src="${esc(i.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}<div><small>${esc(i.source)} <i>· ${ago(i.time)}</i></small><b>${esc(i.title)}</b>${i.summary?`<p>${esc(i.summary)}</p>`:""}</div></a>`;
+(async()=>{
+  const [n,cal]=await Promise.all([fetch("news.json?"+Date.now()).then(r=>r.json()),fetch("https://api.jolpi.ca/ergast/f1/current.json").then(r=>r.json()).catch(()=>null)]);
+  $("all").innerHTML=n.items.map(card).join("");
+  $("foot").textContent=`Headlines from BBC Sport, Motorsport.com, The Race, Sky Sports, Formula1.com and Crash.net. Tap a box to read the full story at the source. Updated ${new Date(n.updated).toLocaleString("en-SG",{timeZone:"Asia/Singapore",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})} SGT.`;
+  if(!cal)return;
+  const done=cal.MRData.RaceTable.Races.filter(r=>new Date(`${r.date}T${r.time||"00:00:00Z"}`)<Date.now()).pop();
+  if(!done)return;
+  const L=done.Circuit.Location,keys=[L.locality,L.country,done.raceName.replace(/ Grand Prix.*/,"")].filter(k=>k&&k.length>3).map(k=>k.toLowerCase());
+  const hits=n.items.filter(i=>keys.some(k=>(i.title+" "+i.summary).toLowerCase().includes(k))).slice(0,9);
+  if(hits.length){$("race").hidden=false;$("race").innerHTML=`<h2>${esc(done.raceName)}: what happened</h2><div class="grid">${hits.map(card).join("")}</div>`}
+})().catch(()=>$("all").textContent="Could not load the news. Refresh to retry.");
+</script></body></html>

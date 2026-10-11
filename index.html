@@ -10,7 +10,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);paddi
 main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--red);padding-bottom:10px}
 h1{margin:0;font-size:28px;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.02em}
-header span{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+nav{display:flex;gap:16px;font-weight:700;text-transform:uppercase;font-size:13px;letter-spacing:.08em}nav a{color:var(--muted);text-decoration:none;padding-bottom:2px}nav a[aria-current]{color:var(--fg);border-bottom:2px solid var(--red)}
+.tz{color:var(--muted);font-size:12px;margin:0}
 .next{background:var(--red);color:var(--on-red);padding:16px;border-radius:4px;display:flex;flex-direction:column;gap:6px}
 .next small{text-transform:uppercase;letter-spacing:.1em;font-weight:700;opacity:.85}
 .next h2{margin:0;font-size:24px;font-weight:900}
@@ -34,8 +35,8 @@ header span{color:var(--muted);font-size:13px;text-transform:uppercase;letter-sp
 @media(max-width:480px){.race{grid-template-columns:36px 1fr}.when{grid-column:2;text-align:left}}
 </style></head><body>
 <main>
-<header><h1>F1 2026 Schedule</h1><span>Times in Singapore (SGT)</span></header>
-<section id="live" hidden></section><section id="next"></section><section id="res"></section><section id="std"></section><section id="list"></section>
+<header><h1>F1 2026 Schedule</h1><nav><a href="./" aria-current="page">Schedule</a><a href="news.html">News</a></nav></header>
+<p class="tz">All times in Singapore (SGT)</p><section id="live" hidden></section><section id="next"></section><section id="res"></section><section id="std"></section><section id="list"></section>
 </main>
 <script>
 const J="https://api.jolpi.ca/ergast/f1/current/",O="https://api.openf1.org/v1/";
