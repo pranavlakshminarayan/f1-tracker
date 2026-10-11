@@ -100,9 +100,8 @@ def post(expect_date=None, tries=40):
     else:
         print("season finished")
     # text link message
-    data = ("chat_id=" + os.environ["TELEGRAM_CHAT_ID"] + "&text=" + urllib.request.quote(f"Schedule: {PAGE_URL}
-Standings: {PAGE_URL}standings.html
-News: {PAGE_URL}news.html")).encode()
+    msg = "Schedule: " + PAGE_URL + "\nStandings: " + PAGE_URL + "standings.html\nNews: " + PAGE_URL + "news.html"
+    data = ("chat_id=" + os.environ["TELEGRAM_CHAT_ID"] + "&text=" + urllib.request.quote(msg)).encode()
     urllib.request.urlopen(f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage", data, timeout=30).read()
 
 
