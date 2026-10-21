@@ -25,9 +25,20 @@ def sessions_of(race):
     return sorted(result, key=lambda s: s[1])
 
 
+SITE = "https://pranavlakshminarayan.github.io/f1-tracker/"
+REMIND_DAYS = 4
+
+
 def build_message(now):
     for race in get_races():
         ses = sessions_of(race)
+        if (ses[-1][1].date() - now.date()).days == REMIND_DAYS:
+            loc = race["Circuit"]["Location"]
+            lines = [f"⏰ {race['raceName']} is {REMIND_DAYS} days away (Round {race['round']})",
+                     f"{race['Circuit']['circuitName']} · {loc['locality']}, {loc['country']}", ""]
+            lines += [f"• {n}: {t:%a %d %b, %H:%M} SGT" for n, t in ses]
+            lines += ["", f"Schedule: {SITE}", f"News: {SITE}news.html"]
+            return "\n".join(lines)
         today = [s for s in ses if s[1].date() == now.date()]
         if today:
             loc = race["Circuit"]["Location"]
