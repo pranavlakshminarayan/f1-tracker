@@ -192,19 +192,66 @@ def race_end(race):
     return start + timedelta(hours=3)
 
 
+def lap_fmt(x):
+    m = int(x // 60)
+    return f"{m}:{x - m * 60:06.3f}" if m else f"{x:.3f}"
+
+
+def quali_rows(s):
+    res = of1(f"session_result?session_key={s['session_key']}")
+    drv = {d["driver_number"]: d for d in of1(f"drivers?session_key={s['session_key']}")}
+    rows = []
+    for r in sorted(res, key=lambda x: x.get("position") or 99):
+        d = drv.get(r["driver_number"], {})
+        best = [t for t in (r.get("duration") or []) if isinstance(t, (int, float))]
+        gap = [g for g in (r.get("gap_to_leader") or []) if isinstance(g, (int, float))]
+        rows.append([r.get("position") or "-", d.get("name_acronym", r["driver_number"]), d.get("team_name", "")[:16],
+                     lap_fmt(min(best)) if best else "-", "Pole" if r.get("position") == 1 else (f"+{gap[-1]:.3f}" if gap else "")])
+    return rows
+
+
+def post_qualifying(state, now):
+    """Send qualifying / sprint qualifying results that finished in the last 12 hours and have not been sent yet."""
+    sent = state.setdefault("sessions", [])
+    races = get("races.json")["RaceTable"]["Races"]
+    for s in of1(f"sessions?year={now.year}"):
+        if s["session_name"] not in ("Qualifying", "Sprint Qualifying", "Sprint Shootout") or s["session_key"] in sent:
+            continue
+        age = now - datetime.fromisoformat(s["date_end"])
+        if not timedelta(minutes=15) < age < timedelta(hours=12):
+            continue
+        rows = quali_rows(s)
+        if not rows:
+            continue
+        d0 = datetime.fromisoformat(s["date_end"]).date()
+        race = next((r for r in races if 0 <= (datetime.fromisoformat(r["date"]).date() - d0).days <= 4), None)
+        name = race["raceName"] if race else s["location"]
+        label = "Qualifying" if s["session_name"] == "Qualifying" else "Sprint Qualifying"
+        sub = (f"Round {race['round']} · " if race else "") + f"Pole: {rows[0][1]}"
+        send_photo(table_image(f"{name} – {label}", sub, ["POS", "DRIVER", "TEAM", "BEST LAP", "GAP"], rows, [90, 130, 260, 170, 130]), f"{name}: {label} result")
+        sent.append(s["session_key"])
+        json.dump(state, open(STATE, "w"))
+        print("posted", label, name)
+
+
 def auto():
     now = datetime.now(timezone.utc)
+    state = json.load(open(STATE)) if os.path.exists(STATE) else {}
+    try:
+        post_qualifying(state, now)
+    except Exception as e:
+        print("qualifying post failed:", e)
     races = get("races.json")["RaceTable"]["Races"]
     done = [r for r in races if now > race_end(r) + timedelta(minutes=20)]
     if not done:
         print("no finished race yet"); return
     r = done[-1]
     key = f"{r['season']}-{int(r['round'])}"
-    state = json.load(open(STATE)) if os.path.exists(STATE) else {}
     if state.get("last") == key:
-        print("already posted", key); return
+        print("race already posted", key); return
     post(r["date"], tries=1)
-    json.dump({"last": key}, open(STATE, "w"))
+    state["last"] = key
+    json.dump(state, open(STATE, "w"))
     print("posted", key)
 
 

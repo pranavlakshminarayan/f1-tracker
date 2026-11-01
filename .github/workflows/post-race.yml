@@ -1,7 +1,7 @@
 name: F1 post-race update
 on:
   schedule:
-    - cron: "*/15 * * * 0,1,6"   # Sat/Sun/Mon UTC; does nothing unless a finished race has not been posted yet
+    - cron: "*/15 * * * 0,1,5,6"   # Fri/Sat/Sun/Mon UTC; does nothing unless a finished race has not been posted yet
   workflow_dispatch:
 concurrency:
   group: f1-post
