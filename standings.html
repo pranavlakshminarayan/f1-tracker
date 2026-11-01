@@ -103,6 +103,24 @@ async function liveFinal(race,D){
   return{rows:order.map((c,i)=>[i+1,c,team[c]||"","provisional",list[i].pts]),list};
 }
 
+// Results of the most recent finished session (practice, qualifying, sprint) from live timing
+const SESS={"Practice 1":"FP1","Practice 2":"FP2","Practice 3":"FP3","Sprint Qualifying":"Sprint Qualifying","Sprint Shootout":"Sprint Qualifying","Sprint":"Sprint","Qualifying":"Qualifying","Race":"Race"};
+async function latestSession(){
+  const all=await oget(`sessions?year=${new Date().getFullYear()}`);
+  return all.filter(s=>new Date(s.date_end).getTime()+10*60e3<Date.now()).sort((a,b)=>new Date(a.date_end)-new Date(b.date_end)).pop()||null;
+}
+const lap=x=>{if(x==null)return"—";const m=Math.floor(x/60);return m?`${m}:${(x-m*60).toFixed(3).padStart(6,"0")}`:x.toFixed(3)};
+const nums=v=>(Array.isArray(v)?v:[v]).filter(x=>typeof x==="number");
+async function sessionRows(s){
+  const [r,d]=await Promise.all([oget(`session_result?session_key=${s.session_key}`),oget(`drivers?session_key=${s.session_key}`)]);
+  if(!r.length)return null;
+  const dm={};d.forEach(x=>dm[x.driver_number]=x);
+  return r.sort((a,b)=>(a.position||99)-(b.position||99)).map(x=>{
+    const best=nums(x.duration),gap=nums(x.gap_to_leader),dr=dm[x.driver_number]||{};
+    return[x.position||"—",dr.name_acronym||x.driver_number,dr.team_name||"",best.length?lap(Math.min(...best)):"—",x.position===1?"Leader":(gap.length?"+"+gap[gap.length-1].toFixed(3):(x.dns?"DNS":x.dnf?"DNF":x.dsq?"DSQ":""))];
+  });
+}
+
 // Podium section
 const SLUG={"mercedes":"mercedes","ferrari":"ferrari","mclaren":"mclaren","red bull":"red-bull-racing","rb f1 team":"racing-bulls","racing bulls":"racing-bulls","alpine":"alpine","williams":"williams","aston martin":"aston-martin"};
 const logoOf=n=>{const k=Object.keys(SLUG).find(k=>n.toLowerCase().startsWith(k));return k?`https://media.formula1.com/content/dam/fom-website/teams/2025/${SLUG[k]}-logo.png`:""};
@@ -133,7 +151,20 @@ function podium(title,items){
     if(base)S=fromFeed(base);
     else{const prev=await getS(R-1);S=addPoints(prev.D,prev.C,L.Results.map(r=>({who:code(r.Driver),pts:+r.points,win:r.position==="1"?1:0})));stdBadge=PROV}
   }
-  $("res").innerHTML=tbl(title,["Pos","Driver","Team","Time / Status","Pts"],res,resBadge);
+  // Latest finished session of any kind (FP1 ... Race): named in the title, updated after every session
+  let shownTitle=title.replace("Last race · ","Latest result · ")+" · Race",shownHead=["Pos","Driver","Team","Time / Status","Pts"],shownRes=res,shownBadge=resBadge;
+  try{
+    const ls=await latestSession();
+    if(ls&&ls.session_name!=="Race"){
+      const rows=await sessionRows(ls);
+      if(rows){
+        const d0=ls.date_end.slice(0,10),gp=races.find(r=>r.date>=d0&&(new Date(r.date)-new Date(d0))/864e5<=4);
+        shownTitle=`Latest result · ${gp?gp.raceName:ls.location} · ${SESS[ls.session_name]||ls.session_name}`;
+        shownHead=["Pos","Driver","Team","Best lap","Gap"];shownRes=rows;shownBadge="";
+      }
+    }
+  }catch(e){}
+  $("res").innerHTML=tbl(shownTitle,shownHead,shownRes,shownBadge);
   $("std").innerHTML=tbl("Driver standings",["Pos","Driver","Team","Wins","Pts"],S.drivers,stdBadge);
   $("con").innerHTML=tbl("Constructor standings",["Pos","Team","Wins","Pts"],S.cons,stdBadge);
   if(resBadge||stdBadge)$("note").textContent="Provisional: built from live-timing positions and previous standings while the official numbers are pending. This page switches to the official numbers by itself.";

@@ -163,7 +163,7 @@ def post(expect_date=None, tries=40):
         print("results not available"); return
     name, rnd, res, stand, prov = data
     tag = " · PROVISIONAL" if prov else ""
-    send_photo(table_image(f"{name} – Result", f"Round {rnd} · Top 10{tag}", ["POS", "DRIVER", "TEAM", "TIME / STATUS", "PTS"],
+    send_photo(table_image(f"{name} – Race Result", f"Round {rnd} · Top 10{tag}", ["POS", "DRIVER", "TEAM", "TIME / STATUS", "PTS"],
                            res, [90, 130, 260, 230, 70]), f"Round {rnd} result" + (" (provisional, official results pending)" if prov else ""))
     send_photo(table_image("Driver Standings", f"After round {rnd}{tag}", ["POS", "DRIVER", "TEAM", "WINS", "PTS"], stand, [90, 130, 260, 120, 90]), "Championship standings")
     nxt = next((r for r in get("races.json")["RaceTable"]["Races"] if int(r["round"]) > int(rnd)), None)
