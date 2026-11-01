@@ -2,16 +2,16 @@
 <p align="center"><b>Race schedule · results · standings · news</b><br>Updates itself after every Grand Prix and sends it to Telegram.</p>
 <p align="center"><a href="https://pranavlakshminarayan.github.io/f1-tracker/"><b>Schedule</b></a> · <a href="https://pranavlakshminarayan.github.io/f1-tracker/standings.html"><b>Standings</b></a> · <a href="https://pranavlakshminarayan.github.io/f1-tracker/news.html"><b>News</b></a></p>
 
-## 🔴 Next race: Mexico City Grand Prix (Round 19)
-Autódromo Hermanos Rodríguez · Mexico City, Mexico
+## 🔴 Next race: Brazilian Grand Prix (Round 20)
+Autódromo José Carlos Pace · São Paulo, Brazil
 
 | Session | Time (Singapore) |
 | --- | --- |
-| FP1 | Sat 31 Oct · 02:30 |
-| FP2 | Sat 31 Oct · 06:00 |
-| FP3 | Sun 01 Nov · 01:30 |
-| Qualifying | Sun 01 Nov · 05:00 |
-| Race | Mon 02 Nov · 04:00 |
+| FP1 | Fri 06 Nov · 23:30 |
+| FP2 | Sat 07 Nov · 03:00 |
+| FP3 | Sat 07 Nov · 22:30 |
+| Qualifying | Sun 08 Nov · 02:00 |
+| Race | Mon 09 Nov · 01:00 |
 
 ## 🏆 Last race: United States Grand Prix (Round 18)
 | Pos | Driver | Team | Time / Status | Pts |
@@ -57,7 +57,7 @@ Autódromo Hermanos Rodríguez · Mexico City, Mexico
 | 11 | Cadillac F1 Team | 0 | 0 |
 
 ## 📅 Season progress
-18 of 23 races complete.
+19 of 23 races complete.
 
 ## ⚙️ How it works
 - **Telegram bot** posts the results, standings and next-race block after each race, and live positions during the race.
