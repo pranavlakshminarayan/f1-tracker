@@ -61,7 +61,8 @@ const fD=d=>d.toLocaleDateString("en-SG",{weekday:"short",day:"numeric",month:"s
 const fT=d=>d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:tz});
 const J="https://api.jolpi.ca/ergast/f1/current/",O="https://api.openf1.org/v1/";
 const jget=p=>fetch(J+p).then(r=>r.json()).then(j=>j.MRData);
-const oget=p=>fetch(O+p).then(r=>r.ok?r.json():[]).catch(()=>[]);
+const oraw=async p=>{for(let i=0;i<4;i++){try{const r=await fetch(O+p);if(r.ok)return await r.json();if(r.status!==429)return[]}catch(e){}await new Promise(s=>setTimeout(s,800*(i+1)))}return[]};
+const oc={};const oget=p=>p.startsWith("sessions?")?(oc[p]||(oc[p]=oraw(p))):oraw(p);
 const code=x=>x.code||x.familyName.slice(0,3).toUpperCase();
 const KEYS=[["FirstPractice","FP1"],["SecondPractice","FP2"],["ThirdPractice","FP3"],["SprintQualifying","Sprint Quali"],["Sprint","Sprint"],["Qualifying","Qualifying"]];
 const dt=o=>new Date(`${o.date}T${o.time||"00:00:00Z"}`);
