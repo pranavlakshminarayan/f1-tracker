@@ -22,10 +22,10 @@ Autódromo José Carlos Pace · São Paulo, Brazil
 | 4 | LEC | Ferrari | +10.707 | 12 |
 | 5 | NOR | McLaren | +11.778 | 10 |
 | 6 | RUS | Mercedes | +12.263 | 8 |
-| 7 | PIA | McLaren | +19.475 | 6 |
-| 8 | COL | Alpine F1 Team | +20.204 | 4 |
-| 9 | LAW | RB F1 Team | +20.899 | 2 |
-| 10 | GAS | Alpine F1 Team | +21.483 | 1 |
+| 7 | LAW | RB F1 Team | +20.899 | 6 |
+| 8 | BOR | Audi | +22.041 | 4 |
+| 9 | HAD | Red Bull | +22.503 | 2 |
+| 10 | HIR | Haas F1 Team | +25.373 | 1 |
 
 ## 👤 Driver standings (after Round 19)
 | Pos | Driver | Team | Wins | Pts |
@@ -36,22 +36,22 @@ Autódromo José Carlos Pace · São Paulo, Brazil
 | 4 | RUS | Mercedes | 3 | 250 |
 | 5 | LEC | Ferrari | 1 | 245 |
 | 6 | NOR | McLaren | 2 | 221 |
-| 7 | PIA | McLaren | 0 | 150 |
-| 8 | HAD | Red Bull | 0 | 105 |
-| 9 | LAW | RB F1 Team | 0 | 79 |
-| 10 | GAS | Alpine F1 Team | 0 | 43 |
+| 7 | PIA | McLaren | 0 | 144 |
+| 8 | HAD | Red Bull | 0 | 107 |
+| 9 | LAW | RB F1 Team | 0 | 83 |
+| 10 | GAS | Alpine F1 Team | 0 | 42 |
 
 ## 🏎️ Constructor standings (after Round 19)
 | Pos | Team | Wins | Pts |
 | --- | --- | --- | --- |
 | 🥇 1 | Mercedes | 12 | 630 |
 | 🥈 2 | Ferrari | 2 | 504 |
-| 🥉 3 | Red Bull | 3 | 380 |
-| 4 | McLaren | 2 | 371 |
-| 5 | RB F1 Team | 0 | 104 |
-| 6 | Alpine F1 Team | 0 | 74 |
-| 7 | Haas F1 Team | 0 | 30 |
-| 8 | Audi | 0 | 23 |
+| 🥉 3 | Red Bull | 3 | 382 |
+| 4 | McLaren | 2 | 365 |
+| 5 | RB F1 Team | 0 | 108 |
+| 6 | Alpine F1 Team | 0 | 69 |
+| 7 | Haas F1 Team | 0 | 31 |
+| 8 | Audi | 0 | 27 |
 | 9 | Williams | 0 | 12 |
 | 10 | Aston Martin | 0 | 7 |
 | 11 | Cadillac F1 Team | 0 | 0 |
