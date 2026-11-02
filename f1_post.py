@@ -180,11 +180,20 @@ def post(expect_date=None, tries=40):
 STATE = "post_state.json"
 
 
+_SESSIONS = {}
+
+
+def year_sessions(year):
+    if year not in _SESSIONS:
+        _SESSIONS[year] = of1(f"sessions?year={year}&session_name=Race")
+    return _SESSIONS[year]
+
+
 def race_end(race):
     """Real end time from OpenF1 when known, otherwise scheduled start + 3h."""
     start = datetime.fromisoformat(f"{race['date']}T{race.get('time', '00:00:00Z')}".replace("Z", "+00:00"))
     try:
-        s = next((x for x in of1(f"sessions?year={race['season']}&session_name=Race") if x["date_start"][:10] == race["date"]), None)
+        s = next((x for x in year_sessions(race["season"]) if x["date_start"][:10] == race["date"]), None)
         if s:
             return datetime.fromisoformat(s["date_end"])
     except Exception:
