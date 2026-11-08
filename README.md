@@ -20,10 +20,10 @@ Las Vegas Strip Street Circuit · Las Vegas, USA
 | 🥈 2 | VER | Red Bull | +14.602 | 18 |
 | 🥉 3 | HAD | Red Bull | +24.485 | 15 |
 | 4 | RUS | Mercedes | +33.991 | 12 |
-| 5 | ANT | Mercedes | +36.017 | 10 |
+| 5 | ANT | Mercedes | +41.017 | 10 |
 | 6 | PIA | McLaren | +56.475 | 8 |
-| 7 | LEC | Ferrari | +1:13.586 | 6 |
-| 8 | LAW | RB F1 Team | +1:15.402 | 4 |
+| 7 | LAW | RB F1 Team | +1:15.402 | 6 |
+| 8 | LEC | Ferrari | +1:18.586 | 4 |
 | 9 | HAM | Ferrari | +4.427 | 2 |
 | 10 | HUL | Audi | +17.105 | 1 |
 
@@ -34,21 +34,21 @@ Las Vegas Strip Street Circuit · Las Vegas, USA
 | 🥈 2 | VER | Red Bull | 3 | 279 |
 | 🥉 3 | RUS | Mercedes | 3 | 262 |
 | 4 | HAM | Ferrari | 1 | 261 |
-| 5 | LEC | Ferrari | 1 | 251 |
+| 5 | LEC | Ferrari | 1 | 249 |
 | 6 | NOR | McLaren | 3 | 246 |
 | 7 | PIA | McLaren | 0 | 152 |
 | 8 | HAD | Red Bull | 0 | 122 |
-| 9 | LAW | RB F1 Team | 0 | 87 |
+| 9 | LAW | RB F1 Team | 0 | 89 |
 | 10 | GAS | Alpine F1 Team | 0 | 42 |
 
 ## 🏎️ Constructor standings (after Round 20)
 | Pos | Team | Wins | Pts |
 | --- | --- | --- | --- |
 | 🥇 1 | Mercedes | 12 | 652 |
-| 🥈 2 | Ferrari | 2 | 512 |
+| 🥈 2 | Ferrari | 2 | 510 |
 | 🥉 3 | Red Bull | 3 | 415 |
 | 4 | McLaren | 3 | 398 |
-| 5 | RB F1 Team | 0 | 112 |
+| 5 | RB F1 Team | 0 | 114 |
 | 6 | Alpine F1 Team | 0 | 69 |
 | 7 | Haas F1 Team | 0 | 31 |
 | 8 | Audi | 0 | 28 |
