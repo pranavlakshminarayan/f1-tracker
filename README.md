@@ -2,62 +2,62 @@
 <p align="center"><b>Race schedule · results · standings · news</b><br>Updates itself after every Grand Prix and sends it to Telegram.</p>
 <p align="center"><a href="https://pranavlakshminarayan.github.io/f1-tracker/"><b>Schedule</b></a> · <a href="https://pranavlakshminarayan.github.io/f1-tracker/standings.html"><b>Standings</b></a> · <a href="https://pranavlakshminarayan.github.io/f1-tracker/news.html"><b>News</b></a></p>
 
-## 🔴 Next race: Brazilian Grand Prix (Round 20)
-Autódromo José Carlos Pace · São Paulo, Brazil
+## 🔴 Next race: Las Vegas Grand Prix (Round 21)
+Las Vegas Strip Street Circuit · Las Vegas, USA
 
 | Session | Time (Singapore) |
 | --- | --- |
-| FP1 | Fri 06 Nov · 23:30 |
-| FP2 | Sat 07 Nov · 03:00 |
-| FP3 | Sat 07 Nov · 22:30 |
-| Qualifying | Sun 08 Nov · 02:00 |
-| Race | Mon 09 Nov · 01:00 |
+| FP1 | Fri 20 Nov · 08:30 |
+| FP2 | Fri 20 Nov · 12:00 |
+| FP3 | Sat 21 Nov · 08:30 |
+| Qualifying | Sat 21 Nov · 12:00 |
+| Race | Sun 22 Nov · 12:00 |
 
-## 🏆 Last race: Mexico City Grand Prix (Round 19)
+## 🏆 Last race: Brazilian Grand Prix (Round 20)
 | Pos | Driver | Team | Time / Status | Pts |
 | --- | --- | --- | --- | --- |
-| 🥇 1 | VER | Red Bull | 2:20:28.772 | 25 |
-| 🥈 2 | HAM | Ferrari | +0.799 | 18 |
-| 🥉 3 | ANT | Mercedes | +4.006 | 15 |
-| 4 | LEC | Ferrari | +10.707 | 12 |
-| 5 | NOR | McLaren | +11.778 | 10 |
-| 6 | RUS | Mercedes | +12.263 | 8 |
-| 7 | LAW | RB F1 Team | +20.899 | 6 |
-| 8 | BOR | Audi | +22.041 | 4 |
-| 9 | HAD | Red Bull | +22.503 | 2 |
-| 10 | HIR | Haas F1 Team | +25.373 | 1 |
+| 🥇 1 | NOR | McLaren | 1:35:23.504 | 25 |
+| 🥈 2 | VER | Red Bull | +14.602 | 18 |
+| 🥉 3 | HAD | Red Bull | +24.485 | 15 |
+| 4 | RUS | Mercedes | +33.991 | 12 |
+| 5 | ANT | Mercedes | +36.017 | 10 |
+| 6 | PIA | McLaren | +56.475 | 8 |
+| 7 | LEC | Ferrari | +1:13.586 | 6 |
+| 8 | LAW | RB F1 Team | +1:15.402 | 4 |
+| 9 | HAM | Ferrari | +4.427 | 2 |
+| 10 | HUL | Audi | +17.105 | 1 |
 
-## 👤 Driver standings (after Round 19)
+## 👤 Driver standings (after Round 20)
 | Pos | Driver | Team | Wins | Pts |
 | --- | --- | --- | --- | --- |
-| 🥇 1 | ANT | Mercedes | 9 | 380 |
-| 🥈 2 | VER | Red Bull | 3 | 261 |
-| 🥉 3 | HAM | Ferrari | 1 | 259 |
-| 4 | RUS | Mercedes | 3 | 250 |
-| 5 | LEC | Ferrari | 1 | 245 |
-| 6 | NOR | McLaren | 2 | 221 |
-| 7 | PIA | McLaren | 0 | 144 |
-| 8 | HAD | Red Bull | 0 | 107 |
-| 9 | LAW | RB F1 Team | 0 | 83 |
+| 🥇 1 | ANT | Mercedes | 9 | 390 |
+| 🥈 2 | VER | Red Bull | 3 | 279 |
+| 🥉 3 | RUS | Mercedes | 3 | 262 |
+| 4 | HAM | Ferrari | 1 | 261 |
+| 5 | LEC | Ferrari | 1 | 251 |
+| 6 | NOR | McLaren | 3 | 246 |
+| 7 | PIA | McLaren | 0 | 152 |
+| 8 | HAD | Red Bull | 0 | 122 |
+| 9 | LAW | RB F1 Team | 0 | 87 |
 | 10 | GAS | Alpine F1 Team | 0 | 42 |
 
-## 🏎️ Constructor standings (after Round 19)
+## 🏎️ Constructor standings (after Round 20)
 | Pos | Team | Wins | Pts |
 | --- | --- | --- | --- |
-| 🥇 1 | Mercedes | 12 | 630 |
-| 🥈 2 | Ferrari | 2 | 504 |
-| 🥉 3 | Red Bull | 3 | 382 |
-| 4 | McLaren | 2 | 365 |
-| 5 | RB F1 Team | 0 | 108 |
+| 🥇 1 | Mercedes | 12 | 652 |
+| 🥈 2 | Ferrari | 2 | 512 |
+| 🥉 3 | Red Bull | 3 | 415 |
+| 4 | McLaren | 3 | 398 |
+| 5 | RB F1 Team | 0 | 112 |
 | 6 | Alpine F1 Team | 0 | 69 |
 | 7 | Haas F1 Team | 0 | 31 |
-| 8 | Audi | 0 | 27 |
+| 8 | Audi | 0 | 28 |
 | 9 | Williams | 0 | 12 |
 | 10 | Aston Martin | 0 | 7 |
 | 11 | Cadillac F1 Team | 0 | 0 |
 
 ## 📅 Season progress
-19 of 23 races complete.
+20 of 23 races complete.
 
 ## ⚙️ How it works
 - **Telegram bot** posts the results, standings and next-race block after each race, and live positions during the race.
