@@ -13,46 +13,46 @@ Lusail International Circuit · Lusail, Qatar
 | Qualifying | Sun 29 Nov · 02:00 |
 | Race | Mon 30 Nov · 00:00 |
 
-## 🏆 Last race: Brazilian Grand Prix (Round 20)
+## 🏆 Last race: Las Vegas Grand Prix (Round 21)
 | Pos | Driver | Team | Time / Status | Pts |
 | --- | --- | --- | --- | --- |
-| 🥇 1 | NOR | McLaren | 1:35:23.504 | 25 |
-| 🥈 2 | VER | Red Bull | +14.602 | 18 |
-| 🥉 3 | HAD | Red Bull | +24.485 | 15 |
-| 4 | RUS | Mercedes | +33.991 | 12 |
-| 5 | ANT | Mercedes | +41.017 | 10 |
-| 6 | PIA | McLaren | +56.475 | 8 |
-| 7 | LAW | RB F1 Team | +1:15.402 | 6 |
-| 8 | LEC | Ferrari | +1:18.586 | 4 |
-| 9 | HAM | Ferrari | +4.427 | 2 |
-| 10 | HUL | Audi | +17.105 | 1 |
+| 🥇 1 | VER | Red Bull | 1:27:39.624 | 25 |
+| 🥈 2 | NOR | McLaren | +0.639 | 18 |
+| 🥉 3 | PIA | McLaren | +1.529 | 15 |
+| 4 | ANT | Mercedes | +2.574 | 12 |
+| 5 | GAS | Alpine F1 Team | +2.927 | 10 |
+| 6 | COL | Alpine F1 Team | +7.955 | 8 |
+| 7 | HAM | Ferrari | +12.795 | 6 |
+| 8 | SAI | Williams | +12.938 | 4 |
+| 9 | RUS | Mercedes | +13.192 | 2 |
+| 10 | LEC | Ferrari | +17.554 | 1 |
 
-## 👤 Driver standings (after Round 20)
+## 👤 Driver standings (after Round 21)
 | Pos | Driver | Team | Wins | Pts |
 | --- | --- | --- | --- | --- |
-| 🥇 1 | ANT | Mercedes | 9 | 390 |
-| 🥈 2 | VER | Red Bull | 3 | 279 |
-| 🥉 3 | RUS | Mercedes | 3 | 262 |
-| 4 | HAM | Ferrari | 1 | 261 |
-| 5 | LEC | Ferrari | 1 | 249 |
-| 6 | NOR | McLaren | 3 | 246 |
-| 7 | PIA | McLaren | 0 | 152 |
+| 🥇 1 | ANT | Mercedes | 9 | 402 |
+| 🥈 2 | VER | Red Bull | 4 | 304 |
+| 🥉 3 | HAM | Ferrari | 1 | 267 |
+| 4 | RUS | Mercedes | 3 | 264 |
+| 5 | NOR | McLaren | 3 | 264 |
+| 6 | LEC | Ferrari | 1 | 250 |
+| 7 | PIA | McLaren | 0 | 167 |
 | 8 | HAD | Red Bull | 0 | 122 |
 | 9 | LAW | RB F1 Team | 0 | 89 |
-| 10 | GAS | Alpine F1 Team | 0 | 42 |
+| 10 | GAS | Alpine F1 Team | 0 | 52 |
 
-## 🏎️ Constructor standings (after Round 20)
+## 🏎️ Constructor standings (after Round 21)
 | Pos | Team | Wins | Pts |
 | --- | --- | --- | --- |
-| 🥇 1 | Mercedes | 12 | 652 |
-| 🥈 2 | Ferrari | 2 | 510 |
-| 🥉 3 | Red Bull | 3 | 415 |
-| 4 | McLaren | 3 | 398 |
+| 🥇 1 | Mercedes | 12 | 666 |
+| 🥈 2 | Ferrari | 2 | 517 |
+| 🥉 3 | Red Bull | 4 | 440 |
+| 4 | McLaren | 3 | 431 |
 | 5 | RB F1 Team | 0 | 114 |
-| 6 | Alpine F1 Team | 0 | 69 |
+| 6 | Alpine F1 Team | 0 | 87 |
 | 7 | Haas F1 Team | 0 | 31 |
 | 8 | Audi | 0 | 28 |
-| 9 | Williams | 0 | 12 |
+| 9 | Williams | 0 | 16 |
 | 10 | Aston Martin | 0 | 7 |
 | 11 | Cadillac F1 Team | 0 | 0 |
 
