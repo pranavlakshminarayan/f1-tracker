@@ -1,7 +1,7 @@
 name: F1 daily check
 on:
   schedule:
-    - cron: "0 0 * * *"   # 08:00 Singapore time
+    - cron: "37 22 * * *"   # 06:37 Singapore time; early + off the hour because GitHub delays cron by hours at 00:00 UTC
   workflow_dispatch:
     inputs:
       test:
